@@ -12,6 +12,7 @@ class Demo1 extends AdventureScene {
             .on('pointerdown', () => {
                 this.showMessage("Let's drink 🍻!");
                 drunk.setText("👨 drunk ✅")
+                this.gainItem('drunkTalk');
             });
         
         let tavernkeeper = this.add.text(this.w * 0.5, this.w * 0.1, "👨‍🦱 tavernkeeper")
@@ -25,6 +26,22 @@ people are afraid of coming out at night
 because of the monster.
                 `);
                 tavernkeeper.setText("👨‍🦱 tavernkeeper ✅")
+                this.gainItem('tavernkeeperTalk');
+            });
+        
+        let hunter = this.add.text(this.w * 0.5, this.w * 0.5, "👨‍🦰 hunter")
+            .setFontSize(this.s * 2)
+            .setInteractive()
+            .on('pointerover', () => this.showMessage("A scar on his face."))
+            .on('pointerdown', () => {
+                this.showMessage(`
+I'm lucky to survive from that monster,
+it seems afraid some herds that I
+was collecting. It's buckthorn, that may
+help to kill it.
+                `);
+                hunter.setText("👨‍🦰 hunter ✅")
+                this.gainItem('hunterTalk');
             });
         // let clip = this.add.text(this.w * 0.3, this.w * 0.3, "📎 paperclip")
         //     .setFontSize(this.s * 2)
@@ -60,31 +77,33 @@ because of the monster.
         //         });
         //     })
 
-        // let door = this.add.text(this.w * 0.1, this.w * 0.15, "🚪 locked door")
-        //     .setFontSize(this.s * 2)
-        //     .setInteractive()
-        //     .on('pointerover', () => {
-        //         if (this.hasItem("key")) {
-        //             this.showMessage("You've got the key for this door.");
-        //         } else {
-        //             this.showMessage("It's locked. Can you find a key?");
-        //         }
-        //     })
-        //     .on('pointerdown', () => {
-        //         if (this.hasItem("key")) {
-        //             this.loseItem("key");
-        //             this.showMessage("*squeak*");
-        //             door.setText("🚪 unlocked door");
-        //             this.gotoScene('demo2');
-        //         }
-        //     })
+        let door = this.add.text(this.w * 0.1, this.w * 0.15, "🚪 locked door")
+            .setFontSize(this.s * 2)
+            .setInteractive()
+            .on('pointerover', () => {
+                if (this.hasItem("drunkTalk") &&  this.hasItem("tavernkeeperTalk") && this.hasItem("hunterTalk")) {
+                    this.showMessage("It's time to alchemy house to craft the herd.");
+                } else {
+                    this.showMessage("You should talk to everyone before leave.");
+                }
+            })
+            .on('pointerdown', () => {
+                if (this.hasItem("drunkTalk") &&  this.hasItem("tavernkeeperTalk") && this.hasItem("hunterTalk")) {
+                    this.loseItem("drunkTalk");
+                    this.loseItem("tavernkeeperTalk");
+                    this.loseItem("hunterTalk");
+                    this.showMessage("*squeak*");
+                    door.setText("🚪 unlocked door");
+                    this.gotoScene('demo2');
+                }
+            })
 
     }
 }
 
 class Demo2 extends AdventureScene {
     constructor() {
-        super("demo2", "The second room has a long name (it truly does).");
+        super("demo2", "Alchemy House");
     }
     onEnter() {
         this.add.text(this.w * 0.3, this.w * 0.4, "just go back")
@@ -152,7 +171,7 @@ const game = new Phaser.Game({
         width: 1920,
         height: 1080
     },
-    scene: [Demo1], //[Intro, Demo1, Demo2, Outro],
+    scene: [Demo1, Demo2], //[Intro, Demo1, Demo2, Outro],
     title: "Adventure Game",
 });
 
