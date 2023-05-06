@@ -106,29 +106,85 @@ class Demo2 extends AdventureScene {
         super("demo2", "Alchemy House");
     }
     onEnter() {
-        this.add.text(this.w * 0.3, this.w * 0.4, "just go back")
+        let buckthorn = this.add.text(this.w * 0.3, this.w * 0.2, "🎍 buckthorn")
+            .setFontSize(this.s * 2)
+            .setInteractive()
+            .on('pointerover', () => this.showMessage("Literally a buckthorn."))
+            .on('pointerdown', () => {
+                this.showMessage("Get a buckthorn.");
+                buckthorn.destroy();
+                this.gainItem('buckthorn');
+            });
+        
+        let abrader = this.add.text(this.w * 0.4, this.w * 0.3, "🔬 abrader")
+            .setFontSize(this.s * 2)
+            .setInteractive()
+            .on('pointerover', () => this.showMessage("It can make the buckthorn to powder."))
+            .on('pointerdown', () => {
+                this.showMessage("Get a abrader.");
+                abrader.destroy();
+                this.gainItem('abrader');
+            });
+        
+        let door = this.add.text(this.w * 0.1, this.w * 0.15, "🚪 locked door")
             .setFontSize(this.s * 2)
             .setInteractive()
             .on('pointerover', () => {
-                this.showMessage("You've got no other choice, really.");
+                if (this.hasItem("green powder")) {
+                    this.showMessage("It's time to find the monster.");
+                } else {
+                    this.showMessage("You didn't craft the herd.");
+                }
             })
             .on('pointerdown', () => {
-                this.gotoScene('demo1');
-            });
-
-        let finish = this.add.text(this.w * 0.6, this.w * 0.2, '(finish the game)')
-            .setInteractive()
-            .on('pointerover', () => {
-                this.showMessage('*giggles*');
-                this.tweens.add({
-                    targets: finish,
-                    x: this.s + (this.h - 2 * this.s) * Math.random(),
-                    y: this.s + (this.h - 2 * this.s) * Math.random(),
-                    ease: 'Sine.inOut',
-                    duration: 500
-                });
+                if (this.hasItem("green powder")) {
+                    this.showMessage("*squeak*");
+                    door.setText("🚪 unlocked door");
+                    this.gotoScene('demo3');
+                }
             })
-            .on('pointerdown', () => this.gotoScene('outro'));
+        // this.add.text(this.w * 0.3, this.w * 0.4, "just go back")
+        //     .setFontSize(this.s * 2)
+        //     .setInteractive()
+        //     .on('pointerover', () => {
+        //         this.showMessage("You've got no other choice, really.");
+        //     })
+        //     .on('pointerdown', () => {
+        //         this.gotoScene('demo1');
+        //     });
+
+        // let finish = this.add.text(this.w * 0.6, this.w * 0.2, '(finish the game)')
+        //     .setInteractive()
+        //     .on('pointerover', () => {
+        //         this.showMessage('*giggles*');
+        //         this.tweens.add({
+        //             targets: finish,
+        //             x: this.s + (this.h - 2 * this.s) * Math.random(),
+        //             y: this.s + (this.h - 2 * this.s) * Math.random(),
+        //             ease: 'Sine.inOut',
+        //             duration: 500
+        //         });
+        //     })
+        //     .on('pointerdown', () => this.gotoScene('outro'));
+    }
+    update() {
+        if (this.hasItem("buckthorn") && this.hasItem("abrader") && !this.hasItem("craftable")) {
+            this.gainItem("craftable");
+            let craft = this.add.text(this.w * 0.2, this.w * 0.3, "craft button")
+                .setFontSize(this.s * 2)
+                .setInteractive()
+                .on('pointerover', () => {
+                    this.showMessage("Click me to craft herd.");
+                })
+                .on('pointerdown', () => {
+                    this.gainItem("green powder");
+                    this.loseItem("buckthorn");
+                    this.loseItem("abrader");
+                    this.loseItem("craftable");
+                    craft.destroy();
+                });
+
+        }
     }
 }
 
