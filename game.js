@@ -133,7 +133,7 @@ class Demo2 extends AdventureScene {
                 if (this.hasItem("green powder")) {
                     this.showMessage("It's time to find the monster.");
                 } else {
-                    this.showMessage("You didn't craft the herd.");
+                    this.showMessage("You haven't crafted the herd.");
                 }
             })
             .on('pointerdown', () => {
@@ -183,7 +183,217 @@ class Demo2 extends AdventureScene {
                     this.loseItem("craftable");
                     craft.destroy();
                 });
+        }
+    }
+}
 
+class Demo3 extends AdventureScene {
+    constructor() {
+        super("demo3", "Outside of Cave");
+    }
+    onEnter() {
+        let stone = this.add.text(this.w * 0.4, this.w * 0.5, "🧱 stone")
+            .setFontSize(this.s * 2)
+            .setInteractive()
+            .on('pointerover', () => this.showMessage("A stone."))
+            .on('pointerdown', () => {
+                this.showMessage("Get a stone.");
+                stone.destroy();
+                this.gainItem('stone');
+            });
+
+        let wall = this.add.text(this.w * 0.3, this.w * 0.2, "🔩🔩🔩 wall")
+            .setFontSize(this.s * 2)
+            .setInteractive()
+            .on('pointerover', () => {
+                if (this.hasItem("stone")) {
+                    this.showMessage("Maybe I can use the stone to hit the wall, to check the monster. Whether is here not not.");
+                } else {
+                    this.showMessage("What should I do to a wall?");
+                }
+            })
+            .on('pointerdown', () => {
+                if (this.hasItem("stone")) {
+                    this.showMessage("Okay, monster is not here. I have time to make a trap.");
+                    wall.destroy();
+                    this.loseItem("stone");
+                    this.gainItem("readyToTrap");
+                } else {
+                    this.showMessage("Don't hit a wall with bare hand!");
+                }
+            });
+
+        let door = this.add.text(this.w * 0.1, this.w * 0.15, "🚪 locked door")
+            .setFontSize(this.s * 2)
+            .setInteractive()
+            .on('pointerover', () => {
+                if (this.hasItem("readyToTrap")) {
+                    this.showMessage("It's time to make a trap.");
+                } else {
+                    this.showMessage("Don't go deeper yet, not sure monster is here or not.");
+                }
+            })
+            .on('pointerdown', () => {
+                if (this.hasItem("readyToTrap")) {
+                    this.showMessage("*squeak*");
+                    this.loseItem("readyToTrap");
+                    door.setText("🚪 unlocked door");
+                    this.gotoScene('demo4');
+                }
+            })
+    }
+}
+
+class Demo4 extends AdventureScene {
+    constructor() {
+        super("demo4", "Monster Lair");
+    }
+    onEnter() {
+        let string = this.add.text(this.w * 0.3, this.w * 0.2, "🔗 string")
+            .setFontSize(this.s * 2)
+            .setInteractive()
+            .on('pointerover', () => this.showMessage("A string."))
+            .on('pointerdown', () => {
+                this.showMessage("Get a string.");
+                string.destroy();
+                this.gainItem('string');
+            });
+        
+        let stick = this.add.text(this.w * 0.4, this.w * 0.3, "🥍 stick")
+            .setFontSize(this.s * 2)
+            .setInteractive()
+            .on('pointerover', () => this.showMessage("A stick."))
+            .on('pointerdown', () => {
+                this.showMessage("Get a stick.");
+                stick.destroy();
+                this.gainItem('stick');
+            });
+        let door = this.add.text(this.w * 0.1, this.w * 0.15, "🚪 locked door")
+            .setFontSize(this.s * 2)
+            .setInteractive()
+            .on('pointerover', () => {
+                if (this.hasItem("trap")) {
+                    this.showMessage("Let's go to place it.");
+                } else {
+                    this.showMessage("Don't go deeper yet, you don't have a trap.");
+                }
+            })
+            .on('pointerdown', () => {
+                if (this.hasItem("trap")) {
+                    this.showMessage("*squeak*");
+                    door.setText("🚪 unlocked door");
+                    this.gotoScene('demo5');
+                }
+            })
+    }
+    update() {
+        if (this.hasItem("stick") && this.hasItem("string") && !this.hasItem("craftable")) {
+            this.gainItem("craftable");
+            let craft = this.add.text(this.w * 0.2, this.w * 0.3, "craft button")
+                .setFontSize(this.s * 2)
+                .setInteractive()
+                .on('pointerover', () => {
+                    this.showMessage("Click me to craft trap.");
+                })
+                .on('pointerdown', () => {
+                    this.gainItem("trap");
+                    this.loseItem("string");
+                    this.loseItem("stick");
+                    this.loseItem("craftable");
+                    craft.destroy();
+                });
+        }
+    }
+    
+}
+
+class Demo5 extends AdventureScene {
+    constructor() {
+        super("demo5", "Monster is coming");
+    }
+    onEnter() {
+        let hole1 = this.add.text(this.w * 0.2, this.w * 0.2, "( ) in the front of the cave")
+            .setFontSize(this.s * 2)
+            .setInteractive()
+            .on('pointerover', () => this.showMessage("Should I place it here?"))
+            .on('pointerdown', () => {
+                this.showMessage("You place it here.");
+                hole1.setText("💣");
+                this.loseItem("trap");
+                this.gainItem("frontTrap");
+                hole2.destroy();
+                hole3.destroy();
+            });
+        let hole2 = this.add.text(this.w * 0.3, this.w * 0.3, "( ) next to the rock")
+            .setFontSize(this.s * 2)
+            .setInteractive()
+            .on('pointerover', () => this.showMessage("Should I place it here?"))
+            .on('pointerdown', () => {
+                this.showMessage("You place it here.");
+                hole2.setText("💣");
+                this.loseItem("trap");
+                this.gainItem("rockTrap");
+                hole1.destroy();
+                hole3.destroy();
+            });
+        let hole3 = this.add.text(this.w * 0.4, this.w * 0.5, "( ) in the middle of the vae")
+            .setFontSize(this.s * 2)
+            .setInteractive()
+            .on('pointerover', () => this.showMessage("Should I place it here?"))
+            .on('pointerdown', () => {
+                this.showMessage("You place it here.");
+                hole3.setText("💣");
+                this.loseItem("trap");
+                this.gainItem("middleTrap");
+                hole1.destroy();
+                hole2.destroy();
+            });
+        let rock = this.add.text(this.w * 0.5, this.w * 0.1, "🗿 rock")
+            .setFontSize(this.s * 2)
+            .setInteractive()
+            .on('pointerover', () => this.showMessage("A rock"))
+    }
+    update() {
+        if (!this.hasItem("trap") && !this.hasItem("monsterIsComing")) {
+            this.gainItem("monsterIsComing");
+            this.time.delayedCall(2000, () => {
+                this.showMessage("It's coming, hide!");
+                this.add.text(this.w * 0.6, this.w * 0.05, "🧑 you")
+                    .setFontSize(this.s * 2)
+                    .setInteractive()
+                    .on('pointerover', () => this.showMessage("What?"))
+                    .on('pointerdown', () => this.showMessage("Don't touch me, you idiot! It's coming!"));
+            });
+            let monster = this.add.text(this.w * 0.1, this.w * 0.3, '🏇 monster')
+                .setFontSize(this.s * 2)
+                .setInteractive()
+                .on('pointerdown', () => {
+                    if (this.hasItem("catchIt")) {
+                        this.showMessage("You use the green powder kill the monster");
+                        this.loseItem("green powder");
+                    }
+                });
+            let tween = this.tweens.add({
+                targets: monster,
+                x: this.w * 0.35,
+                y: this.w * 0.3,
+                duration: 2000,
+                ease: 'Linear',
+                onComplete: () => { 
+                    if (this.hasItem("rockTrap")) {
+                        this.showMessage("You catch it!");
+                        this.gainItem("catchIt");
+                        this.time.delayedCall(2000, () => {
+                            this.gotoScene("good");
+                        });
+                    } else {
+                        this.showMessage("You let it go!");
+                        this.time.delayedCall(2000, () => {
+                            this.gotoScene("bad");
+                        });
+                    }
+                }
+            });
         }
     }
 }
@@ -208,17 +418,27 @@ Now it’s time to set off…..
     }
 }
 
-class Outro extends Phaser.Scene {
+class Good extends Phaser.Scene {
     constructor() {
-        super('outro');
+        super('good');
     }
     create() {
-        this.add.text(50, 50, "That's all!").setFontSize(50);
+        this.add.text(50, 50, "You catch the monster!").setFontSize(50);
         this.add.text(50, 100, "Click anywhere to restart.").setFontSize(20);
         this.input.on('pointerdown', () => this.scene.start('intro'));
     }
 }
 
+class Bad extends Phaser.Scene {
+    constructor() {
+        super('bad');
+    }
+    create() {
+        this.add.text(50, 50, "You let it go!").setFontSize(50);
+        this.add.text(50, 100, "Click anywhere to restart.").setFontSize(20);
+        this.input.on('pointerdown', () => this.scene.start('intro'));
+    }
+}
 
 const game = new Phaser.Game({
     scale: {
@@ -227,7 +447,7 @@ const game = new Phaser.Game({
         width: 1920,
         height: 1080
     },
-    scene: [Demo1, Demo2], //[Intro, Demo1, Demo2, Outro],
+    scene: [Intro, Demo1, Demo2, Demo3, Demo4, Demo5, Good, Bad], //[Intro, Demo1, Demo2, Outro],
     title: "Adventure Game",
 });
 
